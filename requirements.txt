@@ -1,0 +1,25 @@
+# Web UI
+streamlit
+
+# Agent framework
+crewai
+
+# LLM + embeddings provider
+openai
+
+# PDF text extraction (Ingestion Pipeline)
+pypdf
+
+# Vector store for RAG
+chromadb
+
+# Token counting (used for chunking + map-reduce summarization)
+tiktoken
+
+# Load OPENAI_API_KEY and other settings from .env
+python-dotenv
+
+# Use the OS certificate store for HTTPS calls (tiktoken, OpenAI). Fixes
+# SSL certificate errors caused by antivirus/corporate HTTPS scanning
+# (e.g. AVG, Kaspersky) on some Windows machines.
+truststore

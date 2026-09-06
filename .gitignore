@@ -1,0 +1,30 @@
+# Secrets
+.env
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Uploaded user files (course PDFs — personal/uploaded content, not source)
+data/uploads/*
+!data/uploads/.gitkeep
+
+# Local vector database files (Chroma persistence directory)
+data/vectorstore/*
+!data/vectorstore/.gitkeep
+
+# OS/editor noise
+.DS_Store
+.vscode/
+.idea/
+
+# Claude local config
+.claude/

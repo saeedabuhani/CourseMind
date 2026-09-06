@@ -1,0 +1,161 @@
+{
+  "_meta": {
+    "description": "CourseMind evaluation dataset (Phase 10). Exercises the real backend: services.answer_question() and services.summarize_document(), which in turn use the real CrewAI Agent, RAG Retrieval Tool, ChromaDB, and OpenAI API. No mocked pipeline except the single dedicated failure_safety case.",
+    "document_aliases": {
+      "primary": "Resolved at runtime to the filename of the PDF passed via --pdf (the real Hebrew JavaScript course PDF used throughout development). Its document_id is that filename, matching ingestion's own convention.",
+      "secondary": "A small synthetic English document about the Roman Empire, built directly in run_evals.py (no PDF file) so the isolation/English cases are fully portable and never depend on a private user file."
+    },
+    "ground_truth_note": "expected_source_pages / expected_total_pages / expected_total_chunks were determined by directly inspecting the reference PDF's real indexed content (via ingestion.vectorstore.get_document_chunks) BEFORE writing this dataset -- not by running the eval and copying its output. Re-running against a different PDF via --pdf will legitimately fail these content-specific checks; that is expected, not a bug -- see README.",
+    "case_types": "qa (calls services.answer_question), summary (calls services.summarize_document once, shared by all summary-type cases), failure_safety (mocks a RAG failure and checks the system distinguishes it from normal no-evidence)"
+  },
+  "test_cases": [
+    {
+      "id": "EVAL-001",
+      "type": "qa",
+      "categories": ["factual", "hebrew", "source_tracking"],
+      "document_alias": "primary",
+      "question": "מה זה משתנה בשפת JavaScript?",
+      "expected_behavior": "grounded_answer",
+      "should_find_evidence": true,
+      "expected_keywords": ["let", "const", "var"],
+      "min_keyword_matches": 2,
+      "expected_source_pages": [5],
+      "notes": "Factual Hebrew question about variables. Page 5 holds the 'נושא משתנים' definition (verified by inspecting the indexed chunks directly)."
+    },
+    {
+      "id": "EVAL-002",
+      "type": "qa",
+      "categories": ["factual", "hebrew"],
+      "document_alias": "primary",
+      "question": "מה זה מערך בשפת JavaScript?",
+      "expected_behavior": "grounded_answer",
+      "should_find_evidence": true,
+      "expected_keywords": ["Array", "מערך"],
+      "min_keyword_matches": 1,
+      "expected_source_pages": [17],
+      "notes": "Second factual Hebrew question, about arrays. Page 17 holds the 'נושא מערכים' heading."
+    },
+    {
+      "id": "EVAL-003",
+      "type": "qa",
+      "categories": ["explanation", "hebrew"],
+      "document_alias": "primary",
+      "question": "איך פועלות פונקציות בשפת JavaScript?",
+      "expected_behavior": "grounded_answer",
+      "should_find_evidence": true,
+      "expected_keywords": ["function", "Function"],
+      "min_keyword_matches": 1,
+      "notes": "Explanation-style question about functions. Page 15 holds 'נושא פונקציות' (checked separately by EVAL-005 via reuse, to avoid a duplicate API call)."
+    },
+    {
+      "id": "EVAL-004",
+      "type": "qa",
+      "categories": ["multi_chunk", "hebrew"],
+      "document_alias": "primary",
+      "question": "אילו טיפוסי נתונים ואופרטורים יש בשפת JavaScript?",
+      "expected_behavior": "grounded_answer",
+      "should_find_evidence": true,
+      "expected_keywords": ["Number", "String", "Boolean"],
+      "min_keyword_matches": 1,
+      "min_unique_source_pages": 2,
+      "notes": "Deliberately broad question (data types AND operators) expected to draw evidence from multiple distinct pages, not a single chunk."
+    },
+    {
+      "id": "EVAL-005",
+      "type": "qa",
+      "categories": ["source_tracking"],
+      "reuse_case_id": "EVAL-003",
+      "expected_behavior": "grounded_answer",
+      "should_find_evidence": true,
+      "expected_source_pages": [15],
+      "notes": "Reuses EVAL-003's already-fetched real response (no extra API call) specifically to verify the known expected source page for the functions topic."
+    },
+    {
+      "id": "EVAL-006",
+      "type": "qa",
+      "categories": ["no_evidence"],
+      "document_alias": "primary",
+      "question": "מה המתכון הכי טוב לעוגת שוקולד?",
+      "expected_behavior": "no_evidence",
+      "should_find_evidence": false,
+      "notes": "Out-of-scope question #1 (Hebrew) -- a chocolate cake recipe has nothing to do with the JavaScript course material."
+    },
+    {
+      "id": "EVAL-007",
+      "type": "qa",
+      "categories": ["no_evidence"],
+      "document_alias": "primary",
+      "question": "What is the capital city of Australia?",
+      "expected_behavior": "no_evidence",
+      "should_find_evidence": false,
+      "notes": "Out-of-scope question #2 (English) -- unrelated trivia, tests grounding regardless of question language."
+    },
+    {
+      "id": "EVAL-008",
+      "type": "qa",
+      "categories": ["document_isolation_negative"],
+      "document_alias": "primary",
+      "question": "When did the Roman Empire fall?",
+      "expected_behavior": "no_evidence",
+      "should_find_evidence": false,
+      "notes": "A question that DOES have a real answer, but not in THIS document -- scoped to the primary (JS) document, must find nothing."
+    },
+    {
+      "id": "EVAL-009",
+      "type": "qa",
+      "categories": ["document_isolation_positive", "english"],
+      "document_alias": "secondary",
+      "question": "When did the Roman Empire fall?",
+      "expected_behavior": "grounded_answer",
+      "should_find_evidence": true,
+      "expected_keywords": ["476"],
+      "min_keyword_matches": 1,
+      "expected_source_pages": [1],
+      "notes": "Same question as EVAL-008, now correctly scoped to the secondary document where the answer actually lives -- demonstrates isolation is about scoping, not about the question being unanswerable in general."
+    },
+    {
+      "id": "EVAL-010",
+      "type": "qa",
+      "categories": ["english"],
+      "document_alias": "secondary",
+      "question": "When was the Roman Empire founded?",
+      "expected_behavior": "grounded_answer",
+      "should_find_evidence": true,
+      "expected_keywords": ["27", "Augustus"],
+      "min_keyword_matches": 1,
+      "expected_source_pages": [1],
+      "notes": "A second, distinct English question against the secondary document (not a duplicate of EVAL-009)."
+    },
+    {
+      "id": "EVAL-011",
+      "type": "summary",
+      "categories": ["summary_coverage"],
+      "document_alias": "primary",
+      "expected_behavior": "full_document_summary",
+      "expected_total_pages": 21,
+      "expected_total_chunks": 27,
+      "expected_keywords": ["JavaScript", "משתנה", "פונקצי"],
+      "min_keyword_matches": 2,
+      "notes": "Checks general/early coverage: fundamentals, variables, and functions should all be represented. Calibrated to the specific 21-page/27-chunk reference PDF."
+    },
+    {
+      "id": "EVAL-012",
+      "type": "summary",
+      "categories": ["summary_coverage", "late_page_coverage"],
+      "document_alias": "primary",
+      "expected_behavior": "full_document_summary",
+      "expected_keywords": ["אובייקט", "Object"],
+      "min_keyword_matches": 1,
+      "notes": "Objects is a LATE topic: its 'נושא אובייקטים' heading is on page 19 of 21 (verified by inspecting the indexed chunks directly). Its presence in the summary proves the map-reduce pipeline covered the end of the document, not just the first few pages. Shares EVAL-011's single summarize_document() call -- no extra API cost."
+    },
+    {
+      "id": "EVAL-013",
+      "type": "failure_safety",
+      "categories": ["failure_safety"],
+      "document_alias": "primary",
+      "question": "מה זה משתנה בשפת JavaScript?",
+      "expected_behavior": "technical_failure_raised",
+      "notes": "Mocks agent.tools.rag_retrieval_tool.retrieve to raise VectorStoreError mid-run. Expected: services.answer_question() raises QAServiceError (a distinguishable technical failure) rather than returning found_evidence=False or a fabricated answer."
+    }
+  ]
+}

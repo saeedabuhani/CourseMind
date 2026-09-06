@@ -1,0 +1,304 @@
+{
+  "timestamp": "2026-09-06T20:16:37.261277+00:00",
+  "model": "gpt-4o-mini",
+  "embedding_model": "text-embedding-3-small",
+  "primary_pdf": "JavaScript_חלק_א_מדריך_לימוד.pdf",
+  "total_cases": 13,
+  "passed": 13,
+  "failed": 0,
+  "pass_rate": 100.0,
+  "metrics": {
+    "source_hit": {
+      "hits": 5,
+      "total": 5
+    },
+    "grounding_refusal": {
+      "hits": 2,
+      "total": 2
+    },
+    "document_isolation": {
+      "hits": 2,
+      "total": 2
+    },
+    "summary_coverage": {
+      "early_hits": 4,
+      "early_total": 4,
+      "late_pass": true
+    }
+  },
+  "cases": [
+    {
+      "id": "EVAL-001",
+      "type": "qa",
+      "categories": [
+        "factual",
+        "hebrew",
+        "source_tracking"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 4,
+      "checks_total": 4,
+      "reason": "",
+      "details": {
+        "found_evidence": true,
+        "tool_was_used": true,
+        "source_pages": [
+          3,
+          5,
+          1,
+          6
+        ],
+        "expected_source_pages": [
+          5
+        ],
+        "keyword_matches": "3/3"
+      }
+    },
+    {
+      "id": "EVAL-002",
+      "type": "qa",
+      "categories": [
+        "factual",
+        "hebrew"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 4,
+      "checks_total": 4,
+      "reason": "",
+      "details": {
+        "found_evidence": true,
+        "tool_was_used": true,
+        "source_pages": [
+          17,
+          20,
+          1,
+          3
+        ],
+        "expected_source_pages": [
+          17
+        ],
+        "keyword_matches": "1/2"
+      }
+    },
+    {
+      "id": "EVAL-003",
+      "type": "qa",
+      "categories": [
+        "explanation",
+        "hebrew"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 3,
+      "checks_total": 3,
+      "reason": "",
+      "details": {
+        "found_evidence": true,
+        "tool_was_used": true,
+        "source_pages": [
+          15,
+          3,
+          17,
+          21
+        ],
+        "keyword_matches": "2/2"
+      }
+    },
+    {
+      "id": "EVAL-004",
+      "type": "qa",
+      "categories": [
+        "multi_chunk",
+        "hebrew"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 4,
+      "checks_total": 4,
+      "reason": "",
+      "details": {
+        "found_evidence": true,
+        "tool_was_used": true,
+        "source_pages": [
+          7,
+          17,
+          20,
+          2
+        ],
+        "unique_source_pages": 4,
+        "keyword_matches": "3/3"
+      }
+    },
+    {
+      "id": "EVAL-005",
+      "type": "qa",
+      "categories": [
+        "source_tracking"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 3,
+      "checks_total": 3,
+      "reason": "",
+      "details": {
+        "found_evidence": true,
+        "tool_was_used": true,
+        "source_pages": [
+          15,
+          3,
+          17,
+          21
+        ],
+        "expected_source_pages": [
+          15
+        ]
+      }
+    },
+    {
+      "id": "EVAL-006",
+      "type": "qa",
+      "categories": [
+        "no_evidence"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 3,
+      "checks_total": 3,
+      "reason": "",
+      "details": {
+        "found_evidence": false,
+        "tool_was_used": true,
+        "source_pages": []
+      }
+    },
+    {
+      "id": "EVAL-007",
+      "type": "qa",
+      "categories": [
+        "no_evidence"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 3,
+      "checks_total": 3,
+      "reason": "",
+      "details": {
+        "found_evidence": false,
+        "tool_was_used": true,
+        "source_pages": []
+      }
+    },
+    {
+      "id": "EVAL-008",
+      "type": "qa",
+      "categories": [
+        "document_isolation_negative"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 3,
+      "checks_total": 3,
+      "reason": "",
+      "details": {
+        "found_evidence": false,
+        "tool_was_used": true,
+        "source_pages": []
+      }
+    },
+    {
+      "id": "EVAL-009",
+      "type": "qa",
+      "categories": [
+        "document_isolation_positive",
+        "english"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 4,
+      "checks_total": 4,
+      "reason": "",
+      "details": {
+        "found_evidence": true,
+        "tool_was_used": true,
+        "source_pages": [
+          1
+        ],
+        "expected_source_pages": [
+          1
+        ],
+        "keyword_matches": "1/1"
+      }
+    },
+    {
+      "id": "EVAL-010",
+      "type": "qa",
+      "categories": [
+        "english"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 4,
+      "checks_total": 4,
+      "reason": "",
+      "details": {
+        "found_evidence": true,
+        "tool_was_used": true,
+        "source_pages": [
+          1
+        ],
+        "expected_source_pages": [
+          1
+        ],
+        "keyword_matches": "2/2"
+      }
+    },
+    {
+      "id": "EVAL-011",
+      "type": "summary",
+      "categories": [
+        "summary_coverage"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 4,
+      "checks_total": 4,
+      "reason": "",
+      "details": {
+        "total_pages": 21,
+        "total_chunks": 27,
+        "keyword_matches": "3/3"
+      }
+    },
+    {
+      "id": "EVAL-012",
+      "type": "summary",
+      "categories": [
+        "summary_coverage",
+        "late_page_coverage"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 2,
+      "checks_total": 2,
+      "reason": "",
+      "details": {
+        "keyword_matches": "1/2"
+      }
+    },
+    {
+      "id": "EVAL-013",
+      "type": "failure_safety",
+      "categories": [
+        "failure_safety"
+      ],
+      "passed": true,
+      "score": 1.0,
+      "checks_passed": 1,
+      "checks_total": 1,
+      "reason": "",
+      "details": {}
+    }
+  ]
+}
