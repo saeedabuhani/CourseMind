@@ -1,6 +1,6 @@
 # CourseMind Evaluation Report
 
-- Timestamp: 2026-09-06T20:16:37.261277+00:00
+- Timestamp: 2026-09-09T09:55:24.242506+00:00
 - Model: gpt-4o-mini / text-embedding-3-small
 - Reference PDF: JavaScript_חלק_א_מדריך_לימוד.pdf
 

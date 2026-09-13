@@ -20,10 +20,16 @@ from services import (
     QAServiceError,
     SummaryServiceError,
     answer_question,
+    ConversationContext,
     summarize_document,
 )
 
 UPLOAD_DIR = Path(__file__).resolve().parent / "data" / "uploads"
+
+# Asked automatically right after a document is processed, so the student
+# is told what the file contains without having to ask. Phrased to match
+# the document-overview route in services/qa_service.py.
+AUTO_SCAN_QUESTION = "מה יש בקובץ?"
 
 _HEBREW_RE = re.compile(r"[֐-׿]")
 
@@ -60,6 +66,11 @@ def _init_session_state() -> None:
         "processed": False,
         "qa_history": [],
         "summary_response": None,
+        "auto_scan": None,
+        # What the ASK box remembers within this session, for the active
+        # document only. Lets a follow-up like "ומה בעמוד הבא?" resolve
+        # without the student repeating the whole question.
+        "qa_context": ConversationContext(),
     }
     for key, value in defaults.items():
         st.session_state.setdefault(key, value)
@@ -69,22 +80,43 @@ def _reset_document_state() -> None:
     """Called when a newly processed document differs from the active one."""
     st.session_state.qa_history = []
     st.session_state.summary_response = None
+    st.session_state.auto_scan = None
+    # Dropped with the old document on purpose: a page or topic remembered
+    # from the previous file must not steer questions about the new one.
+    st.session_state.qa_context = ConversationContext()
 
 
 def _render_qa_response(resp) -> None:
     with st.container(border=True):
         st.markdown(f"**Q:** {resp.question}")
+        if getattr(resp, "needs_clarification", False):
+            # Not an answer and not a dead end — the question had two
+            # reasonable readings, so CourseMind is asking which was meant.
+            st.info(resp.answer, icon=":material/help:")
+            return
         st.markdown("**Answer**")
         st.markdown(resp.answer, text_alignment=_text_align(resp.answer))
+        if not resp.sources and getattr(resp, "debug", None):
+            with st.expander("How this question was read",
+                             icon=":material/troubleshoot:"):
+                st.caption(resp.debug)
         if resp.sources:
             st.markdown("**Sources**")
             for i, s in enumerate(resp.sources, start=1):
                 st.write(f"{i}. {s.source_filename} — page {s.page_number}")
             with st.expander("Source details", icon=":material/info:"):
+                if getattr(resp, "debug", None):
+                    st.caption(resp.debug)
                 for s in resp.sources:
-                    st.caption(
-                        f"chunk_index={s.chunk_index} · distance={s.distance:.4f}"
-                    )
+                    # distance is None for structural retrieval (a specific
+                    # page, or a whole-document overview) — there is no
+                    # similarity score to show in those modes.
+                    if s.distance is None:
+                        st.caption(f"chunk_index={s.chunk_index} · exact page match")
+                    else:
+                        st.caption(
+                            f"chunk_index={s.chunk_index} · distance={s.distance:.4f}"
+                        )
 
 
 st.set_page_config(
@@ -204,6 +236,22 @@ if uploaded_file is not None:
                         f"{len(result['chunks'])} chunks"
                     )
 
+                    # Immediately scan the new document and show what is in
+                    # it, so the student does not have to ask first. This
+                    # goes through the normal grounded Q&A path (overview
+                    # mode), so the description is built only from the
+                    # document's own text — never from general knowledge.
+                    with st.spinner("Scanning the document..."):
+                        try:
+                            st.session_state.auto_scan = answer_question(
+                                AUTO_SCAN_QUESTION,
+                                document_id=new_document_id,
+                            )
+                        except QAServiceError:
+                            # A failed scan must never block the upload —
+                            # the document is indexed and fully usable.
+                            st.session_state.auto_scan = None
+
 if st.session_state.processed:
     st.info(
         f"Active document: **{st.session_state.active_filename}** — "
@@ -211,6 +259,12 @@ if st.session_state.processed:
         f"{st.session_state.active_chunk_count} chunks",
         icon=":material/description:",
     )
+
+    scan = st.session_state.auto_scan
+    if scan is not None and scan.found_evidence:
+        with st.expander("What is in this document", icon=":material/find_in_page:",
+                         expanded=True):
+            st.markdown(scan.answer, text_alignment=_text_align(scan.answer))
 
 # ----------------------------- Q&A -----------------------------
 st.subheader("Ask your course material", icon=":material/chat:")
@@ -232,7 +286,9 @@ else:
             with st.spinner("Thinking..."):
                 try:
                     response = answer_question(
-                        question, document_id=st.session_state.active_document_id
+                        question,
+                        document_id=st.session_state.active_document_id,
+                        context=st.session_state.qa_context,
                     )
                 except QAServiceError:
                     st.error(
@@ -241,6 +297,22 @@ else:
                     )
                 else:
                     st.session_state.qa_history.insert(0, response)
+                    # Remember this turn so the next one can be a follow-up.
+                    # A clarification is not a turn worth remembering — nothing
+                    # was actually resolved yet.
+                    if not response.needs_clarification:
+                        previous = st.session_state.qa_context
+                        updated = ConversationContext(
+                            document_id=st.session_state.active_document_id,
+                            last_page=response.resolved_page or previous.last_page,
+                            last_topic=response.topic or previous.last_topic,
+                            last_intent=response.retrieval_mode,
+                            recent_turns=list(previous.recent_turns),
+                        )
+                        # The transcript the interpreter reads next turn, so
+                        # "ומה בעמוד הבא?" has something to resolve against.
+                        updated.remember(question, response.answer)
+                        st.session_state.qa_context = updated
 
     for resp in st.session_state.qa_history:
         _render_qa_response(resp)

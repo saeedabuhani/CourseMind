@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-06T20:16:37.261277+00:00",
+  "timestamp": "2026-09-09T09:55:24.242506+00:00",
   "model": "gpt-4o-mini",
   "embedding_model": "text-embedding-3-small",
   "primary_pdf": "JavaScript_חלק_א_מדריך_לימוד.pdf",
@@ -44,10 +44,16 @@
         "found_evidence": true,
         "tool_was_used": true,
         "source_pages": [
-          3,
-          5,
           1,
-          6
+          3,
+          12,
+          7,
+          15,
+          5,
+          4,
+          17,
+          6,
+          20
         ],
         "expected_source_pages": [
           5
@@ -71,10 +77,17 @@
         "found_evidence": true,
         "tool_was_used": true,
         "source_pages": [
+          3,
+          1,
+          15,
+          6,
+          21,
           17,
           20,
-          1,
-          3
+          5,
+          18,
+          8,
+          10
         ],
         "expected_source_pages": [
           17
@@ -98,10 +111,14 @@
         "found_evidence": true,
         "tool_was_used": true,
         "source_pages": [
-          15,
-          3,
           17,
-          21
+          3,
+          20,
+          15,
+          12,
+          21,
+          18,
+          16
         ],
         "keyword_matches": "2/2"
       }
@@ -123,11 +140,16 @@
         "tool_was_used": true,
         "source_pages": [
           7,
+          2,
+          10,
+          9,
           17,
           20,
-          2
+          12,
+          3,
+          18
         ],
-        "unique_source_pages": 4,
+        "unique_source_pages": 9,
         "keyword_matches": "3/3"
       }
     },
@@ -146,10 +168,14 @@
         "found_evidence": true,
         "tool_was_used": true,
         "source_pages": [
-          15,
-          3,
           17,
-          21
+          3,
+          20,
+          15,
+          12,
+          21,
+          18,
+          16
         ],
         "expected_source_pages": [
           15

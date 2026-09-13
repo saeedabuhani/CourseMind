@@ -28,3 +28,13 @@ data/vectorstore/*
 
 # Claude local config
 .claude/
+
+# Generated test artifacts
+_matrix_raw.json
+
+# Presentation work files — only the finished decks and project document are published
+presentation/build/
+presentation/assets/
+presentation/*.txt
+presentation/presentation_plan.md
+*.bak
