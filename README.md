@@ -136,9 +136,7 @@ CourseMind/
 │   ├── test_multichunk_page_regression.py # regression: several chunks on one page
 │   ├── manual_test_matrix.py              # 29-question matrix -> FINAL_TEST_REPORT.md
 │   └── results/                   # latest_results.json + latest_report.md (generated)
-├── presentation/              # final decks (.pptx) and project document (.docx)
-├── FINAL_TEST_REPORT.md       # output of the manual test matrix
-├── PRESENTATION_TEST_REPORT.md
+├── presentation/              # project document (.docx)
 └── data/
     ├── uploads/                  # uploaded PDFs (git-ignored — personal data)
     └── vectorstore/              # local Chroma persistence files (git-ignored)
@@ -153,7 +151,7 @@ The OpenAI API key is **never** hardcoded anywhere in the source, printed, or sh
 ### Quick setup (Windows)
 
 ```powershell
-git clone https://github.com/abohaab-cell/CourseMind.git
+git clone https://github.com/saeedabuhani/CourseMind.git
 cd CourseMind
 .\setup.ps1
 ```
