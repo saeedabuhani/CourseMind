@@ -6,6 +6,19 @@ Upload your own course material (PDF) and get **answers** and **full-document su
 
 > **Status: Phase 10 complete — MVP finished.** PDF upload, indexing, grounded Q&A with source citations, full-document study summaries, and a real evaluation suite are all implemented and verified end-to-end.
 
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Eval](https://img.shields.io/badge/eval%20suite-13%2F13-brightgreen)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-ff4b4b)
+
+### [▶ Live Demo](https://coursemind-demo.netlify.app)
+
+The live demo runs on a small sample document with simulated keyword retrieval (no AI calls, no API key) and shows the grounding rules: cited pages, page and metadata routing, and an explicit "not found". It also shows the real evaluation numbers recorded in `evals/results/`. The real application is the Streamlit app in this repository; it needs your own OpenAI API key.
+
+| | |
+|---|---|
+| ![Demo home](docs/screenshots/01-demo-home.png) | ![Grounded answer with page citation](docs/screenshots/02-demo-qa.png) |
+| ![Refusal when the material does not cover the question](docs/screenshots/03-demo-refusal.png) | ![Streamlit UI](docs/screenshots/04-streamlit-ui.png) |
+
 ## The problem
 
 University and college students, across different academic fields, struggle to quickly find accurate answers inside their own course materials (PDFs, lecture slides) before an exam.
