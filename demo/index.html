@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CourseMind – grounded study assistant (demo)</title>
+<meta name="description" content="CourseMind answers questions from your own course PDF with page citations and refuses when the material does not cover the question. Interactive demo on a sample document.">
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--mut:#53627a;--line:#dce3ee;--acc:#6d28d9;--acc2:#ede9fe;--ok:#15803d;--okbg:#dcfce7;--warn:#92400e;--warnbg:#fef3c7}
+@media (prefers-color-scheme:dark){:root{--bg:#0c1222;--card:#131c33;--ink:#e8eef8;--mut:#a0b0c8;--line:#25345a;--acc:#a78bfa;--acc2:#2a2150;--ok:#4ade80;--okbg:#0f2f1c;--warn:#fbbf24;--warnbg:#33260a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:var(--acc)}.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+.banner{background:#0f172a;color:#fff;font-size:13px;padding:8px 16px;text-align:center}.banner a{color:#c4b5fd}
+header{padding:32px 0 6px}h1{margin:0 0 6px;font-size:clamp(26px,5vw,38px);line-height:1.15}.lead{color:var(--mut);max-width:70ch;margin:0 0 14px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-block;padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;font:600 14px system-ui,sans-serif;cursor:pointer}.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}
+@media (prefers-color-scheme:dark){.btn.p{color:#1a1040}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}h2{font-size:20px;margin:0 0 10px}h3{font-size:15px;margin:14px 0 6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.doc{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;max-height:380px;overflow:auto;font-size:14px}
+.doc section{margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--line)}.doc section:last-child{border:0}.doc h4{margin:0 0 4px;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.doc section.hit{background:var(--acc2);border-radius:8px;padding:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.chips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:99px;padding:5px 11px;font:13px system-ui,sans-serif;cursor:pointer}
+form{display:flex;gap:8px}input[type=text]{flex:1;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font:inherit;min-width:0}
+.ans{margin-top:12px;border-radius:10px;padding:12px;border:1px solid var(--line)}.ans.ok{background:var(--okbg)}.ans.no{background:var(--warnbg)}.ans .mode{font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.src{display:inline-block;background:var(--acc2);color:var(--acc);border-radius:6px;padding:1px 8px;font-size:13px;font-weight:600;margin:4px 4px 0 0}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left}td.n,th.n{text-align:right}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-size:13px;margin:0}
+img.shot{width:100%;border:1px solid var(--line);border-radius:10px}.mut{color:var(--mut);font-size:14px}
+.big{font-size:34px;font-weight:800}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.stats div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+footer{color:var(--mut);font-size:13px;padding:10px 0 40px}
+</style>
+</head>
+<body>
+<div class="banner">Demo mode – sample document and simulated retrieval; no AI is called and no API key is involved. <a href="https://github.com/saeedabuhani/CourseMind">Source on GitHub</a></div>
+<div class="wrap">
+<header>
+<h1>CourseMind</h1>
+<p class="lead">Upload a course PDF and get answers and full-document summaries grounded in that document – with the file and page cited – and an explicit “not found” instead of a guess. The real app is Streamlit + CrewAI + ChromaDB + OpenAI; this page shows the behaviour on a small sample document.</p>
+<div class="cta"><a class="btn p" href="#try">Try the sample</a><a class="btn" href="https://github.com/saeedabuhani/CourseMind">GitHub</a><a class="btn" href="#evals">Evaluation results</a></div>
+</header>
+
+<section class="card" id="try" aria-labelledby="th">
+<h2 id="th">Ask the sample document</h2>
+<p class="mut">The sample is a 4-page mini guide, <em>sample_js_guide.pdf</em>, written for this demo. Retrieval here is simple keyword matching in your browser, and each answer quotes the matching pages. The real app uses embeddings and a language model, but follows the same rules: cite real pages, refuse when nothing relevant is found, route page and metadata questions without a model.</p>
+<div class="grid">
+<div><div class="doc" id="doc" aria-label="Sample document"></div></div>
+<div>
+<div class="chips" id="chips"></div>
+<form id="f"><input type="text" id="q" placeholder="Ask a question about the document" aria-label="Question" autocomplete="off"><button class="btn p">Ask</button></form>
+<div id="out" aria-live="polite"><p class="mut">Pick a suggestion or type your own. Try something the document does not cover, such as “How do I deploy to AWS?”.</p></div>
+</div></div>
+</section>
+
+<section class="card">
+<h2>How a question is routed</h2>
+<table><thead><tr><th>You ask</th><th>Mode</th><th>How it is answered</th></tr></thead><tbody>
+<tr><td>“What is an array?”</td><td><code>semantic</code></td><td>Similarity search over the active document, then a grounding gate</td></tr>
+<tr><td>“What is on page 3?”</td><td><code>page</code></td><td>Structural lookup by stored page number</td></tr>
+<tr><td>“Which topics does it cover?”</td><td><code>overview</code></td><td>Whole-document coverage, not top-k</td></tr>
+<tr><td>“How many pages does it have?”</td><td><code>metadata</code></td><td>Exact counts from the index, no model, no citation</td></tr>
+</tbody></table>
+<p class="mut" style="margin-bottom:0">The classifier can never say “not found” – only retrieval and the programmatic grounding gate decide whether an answer exists.</p>
+</section>
+
+<section class="card" id="evals">
+<h2>Evaluation (from the repository)</h2>
+<div class="stats"><div><span class="big">13/13</span><br><span class="mut">eval cases passed</span></div><div><span class="big">5/5</span><br><span class="mut">source hit rate</span></div><div><span class="big">2/2</span><br><span class="mut">grounding refusals</span></div><div><span class="big">2/2</span><br><span class="mut">document isolation</span></div><div><span class="big">4/4</span><br><span class="mut">summary coverage + late page</span></div></div>
+<p class="mut" style="margin-bottom:0">Recorded run of the scripted suite in <code>evals/</code> against the live backend (gpt-4o-mini, text-embedding-3-small), 9 Sep 2026. Numbers are copied from <code>evals/results/latest_report.md</code>; they are not produced by this page.</p>
+</section>
+
+<section class="card">
+<h2>The real app</h2>
+<img class="shot" src="img/app-home.png" alt="CourseMind Streamlit interface: upload a PDF, then ask your course material" loading="lazy">
+<p class="mut" style="margin-bottom:0">Screenshot of the Streamlit UI (<code>streamlit run app.py</code>). Run it yourself with your own OpenAI key – see the README.</p>
+</section>
+<footer>Built by Saeed Abuhani · Python, Streamlit, CrewAI, ChromaDB, OpenAI · <a href="https://github.com/saeedabuhani/CourseMind">github.com/saeedabuhani/CourseMind</a></footer>
+</div>
+<script>
+var FILE="sample_js_guide.pdf";
+var PAGES=[
+{n:1,t:"Variables",x:"A variable stores a value. Use let for values that change and const for values that must not be reassigned. The older keyword var is function-scoped and is best avoided in new code. JavaScript has primitive types such as number, string, boolean, null and undefined."},
+{n:2,t:"Arrays",x:"An array is an ordered list of values written with square brackets, for example [1, 2, 3]. Indexes start at 0, and the length property gives the number of items. The push method adds an item to the end of an array and pop removes the last item. Methods such as map, filter and reduce create results from an array without changing it."},
+{n:3,t:"Functions",x:"A function is a reusable block of code. A function declaration uses the keyword function; an arrow function uses the shorter syntax (a, b) => a + b. Functions can take parameters and return a value with return. Functions are values, so they can be passed to other functions as callbacks."},
+{n:4,t:"Objects and JSON",x:"An object stores named properties as key and value pairs, for example {name: 'Dana', age: 21}. Access a property with dot notation or square brackets. JSON is a text format for data that looks like an object; JSON.stringify converts an object to text and JSON.parse converts the text back."}];
+var STOP="a an the is are of to in on for and or what how do does it this that with be can i you me my about which who why when where explain tell give".split(" ");
+function tok(s){return (s.toLowerCase().match(/[a-z0-9_.]+/g)||[]).filter(function(w){return STOP.indexOf(w)<0&&w.length>1})}
+function stem(w){return w.replace(/(ing|es|s|ed)$/,"")}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+var doc=document.getElementById("doc"),out=document.getElementById("out");
+function drawDoc(hit){doc.innerHTML=PAGES.map(function(p){return '<section id="p'+p.n+'"'+(hit&&hit.indexOf(p.n)>=0?' class="hit"':"")+'><h4>Page '+p.n+" – "+p.t+"</h4>"+esc(p.x)+"</section>"}).join("")}
+function sentences(x){return x.split(/(?<=[.!?])\s+/)}
+function show(mode,html,ok,pages){out.innerHTML='<div class="ans '+(ok?"ok":"no")+'"><div class="mode">Mode: '+mode+'</div>'+html+(pages&&pages.length?'<div>'+pages.map(function(n){return '<span class="src">'+FILE+' · page '+n+"</span>"}).join("")+"</div>":"")+"</div>";drawDoc(pages)}
+function ask(q){q=q.trim();if(!q)return;var l=q.toLowerCase();
+ var pg=/\bpage\s+(\d+)\b/.exec(l);
+ if(pg){var n=+pg[1],p=PAGES.filter(function(x){return x.n===n})[0];
+  if(!p)return show("page",'<p>That page does not exist. The document has '+PAGES.length+" pages.</p>",false,[]);
+  return show("page","<p><b>Page "+n+" – "+p.t+"</b></p><p>"+esc(p.x)+"</p>",true,[n])}
+ if(/how many pages|number of pages|what is the file called|file name/.test(l))return show("metadata","<p>The document is <b>"+FILE+"</b> and has <b>"+PAGES.length+" pages</b>. (Answered from the index bookkeeping, so no page is cited.)</p>",true,[]);
+ if(/what is (in|on) (this|the) (file|document|pdf)|which topics|what topics|overview|summar|what does (it|the (file|document)) cover|תוכן/.test(l))return show("overview","<p>The document covers, in order:</p><ol>"+PAGES.map(function(p){return "<li>"+p.t+"</li>"}).join("")+"</ol>",true,PAGES.map(function(p){return p.n}));
+ var qt=tok(q).map(stem);if(!qt.length)return show("semantic","<p>The information was not found in the uploaded material.</p>",false,[]);
+ var sc=PAGES.map(function(p){var pt=tok(p.x+" "+p.t).map(stem);var s=0;qt.forEach(function(w){if(pt.indexOf(w)>=0)s++});return {p:p,s:s/qt.length,raw:s}}).filter(function(r){return r.raw>0}).sort(function(a,b){return b.s-a.s});
+ if(!sc.length||sc[0].s<0.34||sc[0].raw<1)return show("semantic","<p>The information was not found in the uploaded material.</p><p class=\"mut\">The grounding gate found no page relevant enough, so no answer is invented.</p>",false,[]);
+ var top=sc.filter(function(r){return r.s>=sc[0].s*0.7}).slice(0,2);
+ var body=top.map(function(r){var ss=sentences(r.p.x).map(function(s){var st=tok(s).map(stem),c=0;qt.forEach(function(w){if(st.indexOf(w)>=0)c++});return {s:s,c:c}});ss.sort(function(a,b){return b.c-a.c});var pick=ss.filter(function(x){return x.c>0}).slice(0,2).map(function(x){return x.s});return "<p>"+esc(pick.join(" "))+"</p>"}).join("");
+ show("semantic",body,true,top.map(function(r){return r.p.n}).sort())}
+var ex=["What is an array?","How do I add an item to an array?","What is on page 3?","How many pages does it have?","Which topics does it cover?","How do I deploy to AWS?"];
+document.getElementById("chips").innerHTML=ex.map(function(e){return '<button type="button">'+e+"</button>"}).join("");
+document.querySelectorAll("#chips button").forEach(function(b){b.onclick=function(){document.getElementById("q").value=b.textContent;ask(b.textContent)}});
+document.getElementById("f").onsubmit=function(e){e.preventDefault();ask(document.getElementById("q").value)};
+drawDoc();
+</script>
+</body>
+</html>
