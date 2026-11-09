@@ -247,3 +247,5 @@ Not part of the current MVP — listed here for clarity, not implied to already 
 - Quiz generation from the uploaded material.
 - Multi-agent orchestration.
 - User accounts/authentication, cloud deployment, and usage analytics.
+
+© 2026 Saeed Abuhani – All rights reserved
